@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}本詳細{% endblock %}
+
+     {% block content %} 
+       <div class="card">
+          <h5 class="card-header">{{ book.title }}</h5>
+          <div class="card-body">
+             <p  class="card-text"> {{ book.text  }}</p>
+             <a href="#"  class="btn  btn-primary">ボタン</a>
+             <h6 class="card-title">{{ book.category }}</h6>
+         </div>
+     </div>     
+{% endblock content %}
+  
