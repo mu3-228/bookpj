@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView,CreateView,DeleteView,UpdateView
 from .models import Book, Review
 
@@ -35,6 +35,12 @@ class CreateReviewView(CreateView):
         print(context)
         print(context['form'].errors)  # ←これ追加
         return context
+    
+    def form_valid(seif, form):
+        form.instrnce.user = seif.request.user
+
+
+        return super().form_valid(form)
     #
     def form_valid(self, form):
         print("🔥通った🔥")
