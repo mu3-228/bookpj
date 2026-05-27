@@ -43,7 +43,7 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 
         return super().form_valid(form)
     #
-    def form_valid(self, form):
+    #def form_valid(self, form):
         print("🔥通った🔥")
         print(form.errors)
         form.instance.book = Book.objects.get(pk=self.kwargs['book_id'])
