@@ -1,31 +1,52 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView,CreateView,DeleteView,UpdateView
 from .models import Book, Review
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import PermissionDenied
 
 
 
 class ListBookView(LoginRequiredMixin, ListView):
     template_name = 'book/book_list.html'
     model = Book
+
+
 class DetailBookView(LoginRequiredMixin, DetailView):
     model = Book
+
+
 class CreateBookView(LoginRequiredMixin, CreateView):
     template_name = 'book/book_create.html'
     model = Book
     fields = ('title', 'text', 'category', 'thumbnail')
     success_url = reverse_lazy('list-book')
+
+
 class DeleteBookView(LoginRequiredMixin, DeleteView):
     template_name = 'book/book_confirm_delete.html'
     model = Book
     success_url = reverse_lazy('list-book')
+
+
 class UpdateBookView(LoginRequiredMixin, UpdateView):
     template_name = 'book/book_update.html'
     model = Book
     fields = ('title', 'text', 'category', 'thumbnail')
-    success_url = reverse_lazy('list-book')
+
+
+
+    def get_object(self, queryset = None):
+        obj = super().get_object(queryset)
+
+        if obj.user != self.request.user:
+            raise PermissionDenied
+        return obj
+    
+    def get_success_url(self):
+        return reverse('detail-book', kwargs={'pk': self.object.id})
+
+
 class CreateReviewView(LoginRequiredMixin, CreateView):
     model = Review
     fields = ('title', 'text', 'rate')
@@ -43,7 +64,7 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
 
 
         return super().form_valid(form)
-    #
+    #??↓
     def form_valid(self, form):
         print("🔥通った🔥")
         print(form.errors)
