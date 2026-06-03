@@ -3,8 +3,8 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views.generic import ListView, DetailView,CreateView,DeleteView,UpdateView
+from django.db.models import Avg
 from .models import Book, Review
-
 
 
 class ListBookView(LoginRequiredMixin, ListView):
@@ -76,13 +76,18 @@ class CreateReviewView(LoginRequiredMixin, CreateView):
         print(form.errors)
         form.instance.book = Book.objects.get(pk=self.kwargs['book_id'])
         form.instance.user = self.request.user
+
         return super().form_valid(form)
+    
+
     #   ↓レビュー対象の本を設定したり、レビュー後どこにいくか
     def get_success_url(self):
         return reverse_lazy('detail-book', kwargs={'pk': self.kwargs['book_id']})
     
 # インデントいらない
 def index_view(request):
-    object_list = Book.objects.order_by('category')
-    return render(request, 'book/index.html',{'object_list' : object_list})
+    object_list = Book.objects.order_by('-id')
+    ranking_list= Book.objects.annotate(avg_rating=Avg('review__rate)')).order_by('-avg_rating')
+
+    return render(request, 'book/index.html',{'object_list' : object_list, 'ranking_list' : ranking_list})
 
